@@ -5,8 +5,6 @@ import java.util.Properties
 import kafka.message._
 import kafka.serializer._
 import kafka.utils._
-import java.util.Properties
-import kafka.utils.Logging
 import scala.collection.JavaConversions._
 import kafka.consumer.ConsumerConfig
 import kafka.consumer.Whitelist
