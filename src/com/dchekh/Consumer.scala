@@ -13,7 +13,7 @@ import scala.collection.mutable.HashMap
 import kafka.consumer.Consumer
 
 
-class Consumer[T](mes: String, sleeptime: Int, cdl: CountDownLatch, cg_config: Properties) extends Runnable {
+class MyConsumer[T](mes: String, sleeptime: Int, cdl: CountDownLatch, cg_config: Properties) extends Runnable {
 
   val config = new ConsumerConfig(cg_config)
   val connector =  Consumer.create(config)
@@ -49,14 +49,15 @@ class Consumer[T](mes: String, sleeptime: Int, cdl: CountDownLatch, cg_config: P
         list = list ++ List(new String(m))
         numMessages += 1
         numMessagesTotal += 1
+        AvroWrapper.decode(m) 
         
 //        println(messageAndTopic.offset.toString + " : decode1 : " + AvroWrapper.decode(m,schema).toString() + "; partition - " + part + "; thread - " + mes)
-        println(messageAndTopic.offset.toString + AvroWrapper.decode(m) + "; partition - " + part + "; thread - " + mes)
+//        println(messageAndTopic.offset.toString + AvroWrapper.decode(m) + "; partition - " + part + "; thread - " + mes)
 
 //        val p1 = new ProcessingMSSQL(1,2)
 //        println(p1.count(2))
 
-        if (numMessages == 100) {
+        if (numMessages == 1000) {
           println("thread - " + mes + "; received messages: " + numMessagesTotal)
 
           numMessages = 0
