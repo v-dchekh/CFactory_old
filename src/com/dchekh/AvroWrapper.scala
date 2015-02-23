@@ -3,15 +3,12 @@ package com.dchekh
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.UUID
-import kafka.consumer._
-import kafka.producer._
+import java.io.ByteArrayInputStream
+
 import org.apache.avro.Schema
 import org.apache.avro.generic.{ GenericDatumReader, GenericData, GenericRecord, GenericDatumWriter }
 import org.apache.avro.io.DecoderFactory
 import org.apache.avro.io.DatumReader
-import java.io.ByteArrayInputStream
-import java.io.File
-import scala.collection.mutable.HashMap
 
 object AvroWrapper {
   final val MAGIC = Array[Byte](0x0)

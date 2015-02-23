@@ -2,12 +2,13 @@
 package com.dchekh
 
 import java.util.Properties
-import scala.xml.XML
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import org.apache.avro.Schema
+import java.util.concurrent.{ CountDownLatch, TimeUnit }
 import java.io.File
+
+import org.apache.avro.Schema
+
 import scala.collection.mutable.HashMap
+import scala.xml.XML
 
 object CFactory {
 
@@ -64,7 +65,7 @@ Where: -v   Run verbosely
     schema_list = SchemaListObj.getSchemaList(cfg_XML)
 
     val latch = new CountDownLatch(SchemaListObj.getThread_number(cfg_XML))
-    
+
     //---------- run consumer group -----------------// 
     val groupList = SchemaListObj.getcons_groupList(cfg_XML)
     groupList.foreach { n =>

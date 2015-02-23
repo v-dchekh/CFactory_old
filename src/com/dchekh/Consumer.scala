@@ -2,15 +2,13 @@ package com.dchekh
 
 import java.util.concurrent.CountDownLatch
 import java.util.Properties
-import kafka.message._
-import kafka.serializer._
-import kafka.utils._
-import kafka.consumer.ConsumerConfig
-import kafka.consumer.Whitelist
+
+import kafka.consumer.{ConsumerConfig, Whitelist, Consumer}
+
 import scala.collection.JavaConversions._
-import org.apache.avro.Schema
 import scala.collection.mutable.HashMap
-import kafka.consumer.Consumer
+
+import org.apache.avro.Schema
 
 
 class MyConsumer[T](mes: String, sleeptime: Int, cdl: CountDownLatch, cg_config: Properties) extends Runnable {
