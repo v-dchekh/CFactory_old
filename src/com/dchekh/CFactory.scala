@@ -5,6 +5,9 @@ import java.util.Properties
 import scala.xml.XML
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.apache.avro.Schema
+import java.io.File
+import scala.collection.mutable.HashMap
 
 object CFactory {
 
@@ -14,6 +17,8 @@ Where: -v   Run verbosely
        -f F Set input file to F
        -s S Set Show option to S
 """
+
+  var schema_list: HashMap[String, Schema] = null // = SchemaListObj.list
 
   var filename: String = ""
   var showme: String = ""
@@ -41,7 +46,6 @@ Where: -v   Run verbosely
   }
 
   def main(args: Array[String]) {
-    println("CFactory v0.1")
     // if there are required args:
     //    if (args.length == 0) die()
     val arglist = args.toList
@@ -49,44 +53,27 @@ Where: -v   Run verbosely
 
     if (filename.length == 0) filename = "d:/Users/Dzmitry_Chekh/Scala_workspace/CFactory/bin/consumer_groups.xml"
 
+    println("CFactory v0.1")
     println("debug=" + debug)
     println("showme=" + showme)
     println("filename=" + filename)
     println("remainingopts=" + remainingopts)
 
-    //"d:/Users/Dzmitry_Chekh/Scala_workspace/CFactory/bin/consumer_groups.xml"
-    var cons_groups_config_XML = XML.loadFile(filename)
-    var cons_groupList = (cons_groups_config_XML \\ "consumer_group")
-    var groupId: String = null
-    var zkconnect: String = null
-    var topic: String = null
-    var thread_number: Int = 0
+    var cfg_XML = XML.loadFile(filename)
 
-    cons_groupList.foreach { n =>
-      thread_number = thread_number + ((n \ "@thread_number").text).toInt
-    }
+    schema_list = SchemaListObj.getSchemaList(cfg_XML)
 
-    val  latch = new CountDownLatch(thread_number)
-
-    val parlist = Map()
-    val key : String = "" 
-    val value : String = "" 
+    val latch = new CountDownLatch(SchemaListObj.getThread_number(cfg_XML))
     
-    
-    
-    cons_groupList.foreach { n =>
-      groupId = (n \ "@groupId").text
-      zkconnect = (n \ "@zkconnect").text
-      topic = (n \ "@topic").text
-      thread_number = ((n \ "@thread_number").text).toInt
-      
-      
+    //---------- run consumer group -----------------// 
+    val groupList = SchemaListObj.getcons_groupList(cfg_XML)
+    groupList.foreach { n =>
+      val i = n.asInstanceOf[Map[String, Any]]
+      val cg = new ConsumerGroup(i("thread_number").toString().toInt, i("zkconnect").toString(), i("groupId").toString(), i("topic").toString(), latch).launch
       //println(s"$groupId, $zkconnect, $topic")
-      val cg = new ConsumerGroup(thread_number, zkconnect, groupId, topic, latch).launch
     }
-
     latch.await()
-    
+
     endOfJob("all threads are finished!")
   }
 
