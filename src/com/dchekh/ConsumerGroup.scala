@@ -31,7 +31,7 @@ class ConsumerGroup(threadNumber: Int = 5, a_zookeeper: String, a_groupId: Strin
     for (i <- 1 to threadNumber by 1) {
       println("start Thread ****  groupId : " + a_groupId + ", thread : " + i)
       try {
-        var consumer = new MyConsumer[String](":" + i, i * 1000, latch, cg_config)
+        var consumer = new MyConsumer[String](":" + i,  latch, cg_config)
         new Thread(consumer).start()
       } catch {
         case e: Throwable =>
