@@ -10,12 +10,11 @@ object SchemaListObj {
 
   def getSchemaList(cfg_XML: Elem) = {
     var schemas_list = (cfg_XML \\ "schemas" \\ "schema")
-    var schena_list = new HashMap[String, Schema]
-    var schema_id: String = null
+    var schena_list = new HashMap[Int, Schema]
     schemas_list.foreach { n =>
       var schema = Schema.parse(new File((n \ "@file").text))
       val m = Map("id" -> (n \ "@id").text, "schema" -> schema)
-      schema_id = (n \ "@id").text
+      var schema_id = (n \ "@id").text.toInt
       schena_list += (schema_id -> schema)
     }
     schena_list
@@ -25,7 +24,6 @@ object SchemaListObj {
     var cons_groupList = (cfg_XML \\ "consumer_groups" \\ "consumer_group")
     val groupList = new ArrayBuffer[Any]()
 
-    var schema_id: String = null
     cons_groupList.foreach { n =>
       val groupId = (n \ "@groupId").text
       val zkconnect = (n \ "@zkconnect").text

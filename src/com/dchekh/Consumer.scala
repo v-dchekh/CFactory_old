@@ -44,9 +44,9 @@ class MyConsumer[T](mes: String, cdl: CountDownLatch, cg_config: Properties) ext
         //println("topic : " + cg_config.getProperty("topic") + "--| " + messageAndTopic.offset.toString  + "; partition - " + part + "; thread - " + mes + s", total = $numMessagesTotal")
         messagArray += message
 
-        if (numMessages == 100) {
+        if (numMessages == 3) {
         println("topic : " + cg_config.getProperty("topic") + "--| " + messageAndTopic.offset.toString  + s"; partition - $part , thread = $mes , total = $numMessagesTotal")
-          //processing(messagArray)
+          processing(messagArray)
           numMessages = 0
           messagArray.clear()
         }

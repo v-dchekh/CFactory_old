@@ -19,7 +19,7 @@ Where: -v   Run verbosely
        -s S Set Show option to S
 """
 
-  var schema_list: HashMap[String, Schema] = null // = SchemaListObj.list
+  var schema_list: HashMap[Int, Schema] = null // = SchemaListObj.list
 
   var filename: String = ""
   var showme: String = ""
