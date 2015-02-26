@@ -14,17 +14,15 @@ class MyConsumer[T](mes: String, cdl: CountDownLatch, cg_config: Properties) ext
   val config = new ConsumerConfig(cg_config)
   val connector = Consumer.create(config)
   val filterSpec = new Whitelist(cg_config.getProperty("topic"))
+  val batch_count = cg_config.getProperty("batch_count").toInt
+  val topic_type = cg_config.getProperty("topic_type").toInt
 
   val stream = connector.createMessageStreamsByFilter(filterSpec, 1).get(0)
   var list = List[String]()
 
   def run() {
-
-    while (true) {
-      read(bytes => {
-        val p1 = new Processing().run(bytes)
-      })
-    }
+    val p1 = new Processing
+    while (true) read(bytes => p1.run(bytes, topic_type))
     cdl.countDown()
   }
 
@@ -44,8 +42,8 @@ class MyConsumer[T](mes: String, cdl: CountDownLatch, cg_config: Properties) ext
         //println("topic : " + cg_config.getProperty("topic") + "--| " + messageAndTopic.offset.toString  + "; partition - " + part + "; thread - " + mes + s", total = $numMessagesTotal")
         messagArray += message
 
-        if (numMessages == 3) {
-        println("topic : " + cg_config.getProperty("topic") + "--| " + messageAndTopic.offset.toString  + s"; partition - $part , thread = $mes , total = $numMessagesTotal")
+        if (numMessages == batch_count) {
+          //println("topic : " + cg_config.getProperty("topic") + "--| " + messageAndTopic.offset.toString  + s"; partition - $part , thread = $mes , total = $numMessagesTotal")
           processing(messagArray)
           numMessages = 0
           messagArray.clear()

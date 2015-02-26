@@ -4,11 +4,10 @@ package com.dchekh
 import java.util.Properties
 import java.util.concurrent.{ CountDownLatch, TimeUnit }
 import java.io.File
-
 import org.apache.avro.Schema
-
 import scala.collection.mutable.HashMap
 import scala.xml.XML
+import scala.xml.Elem
 
 object CFactory {
 
@@ -20,6 +19,7 @@ Where: -v   Run verbosely
 """
 
   var schema_list: HashMap[Int, Schema] = null // = SchemaListObj.list
+  var cfg_XML : Elem = null
 
   var filename: String = ""
   var showme: String = ""
@@ -60,7 +60,7 @@ Where: -v   Run verbosely
     println("filename=" + filename)
     println("remainingopts=" + remainingopts)
 
-    var cfg_XML = XML.loadFile(filename)
+    cfg_XML = XML.loadFile(filename)
 
     schema_list = SchemaListObj.getSchemaList(cfg_XML)
 
@@ -70,7 +70,8 @@ Where: -v   Run verbosely
     val groupList = SchemaListObj.getcons_groupList(cfg_XML)
     groupList.foreach { n =>
       val i = n.asInstanceOf[Map[String, Any]]
-      val cg = new ConsumerGroup(i("thread_number").toString().toInt, i("zkconnect").toString(), i("groupId").toString(), i("topic").toString(), latch).launch
+      val cg = new ConsumerGroup(i("thread_number").toString().toInt, i("zkconnect").toString(), i("groupId").toString(),
+          i("topic").toString(), latch, i("batch_count").toString(), i("topic_type").toString()).launch
       //println(s"$groupId, $zkconnect, $topic")
     }
     latch.await()

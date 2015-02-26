@@ -9,15 +9,16 @@ import scala.xml.Elem
 object SchemaListObj {
 
   def getSchemaList(cfg_XML: Elem) = {
-    var schemas_list = (cfg_XML \\ "schemas" \\ "schema")
-    var schena_list = new HashMap[Int, Schema]
-    schemas_list.foreach { n =>
+    var schema_list_XML = (cfg_XML \\ "schemas" \\ "schema")
+    var schema_list_Map = new HashMap[Int, Schema]
+    schema_list_XML.foreach { n =>
+//      val m = Map("id" -> (n \ "@id").text, "schema" -> schema)
       var schema = Schema.parse(new File((n \ "@file").text))
-      val m = Map("id" -> (n \ "@id").text, "schema" -> schema)
       var schema_id = (n \ "@id").text.toInt
-      schena_list += (schema_id -> schema)
+      schema_list_Map += (schema_id -> schema)
     }
-    schena_list
+    //println("getSchemaList(cfg_XML: Elem)")
+    schema_list_Map
   }
 
   def getcons_groupList(cfg_XML: Elem) = {
@@ -29,8 +30,11 @@ object SchemaListObj {
       val zkconnect = (n \ "@zkconnect").text
       val topic = (n \ "@topic").text
       val thread_number = ((n \ "@thread_number").text).toInt
+      val batch_count = (n \ "@batch_count").text
+      val topic_type = (n \ "@topic_type").text
 
-      val m = Map("groupId" -> groupId, "zkconnect" -> zkconnect, "topic" -> topic, "thread_number" -> thread_number)
+      val m = Map("groupId" -> groupId, "zkconnect" -> zkconnect, "topic" -> topic, "thread_number" -> thread_number, 
+          "batch_count" -> batch_count, "topic_type" -> topic_type)
       groupList += m
 
     }

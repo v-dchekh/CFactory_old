@@ -9,7 +9,8 @@ import java.util.concurrent.CountDownLatch
 import org.apache.avro.Schema
 import scala.collection.mutable.HashMap
 
-class ConsumerGroup(threadNumber: Int = 5, a_zookeeper: String, a_groupId: String, topic: String, latch: CountDownLatch) extends Logging {
+class ConsumerGroup(threadNumber: Int = 5, a_zookeeper: String, a_groupId: String, topic: String, latch: CountDownLatch, 
+    batch_count: String, topic_type : String) extends Logging {
 
   //  info("setup:start topic=%s for zk=%s and groupId=%s".format(topic, a_zookeeper, a_groupId))
 
@@ -21,12 +22,14 @@ class ConsumerGroup(threadNumber: Int = 5, a_zookeeper: String, a_groupId: Strin
     props.put("zookeeper.sync.time.ms", "200")
     props.put("auto.commit.interval.ms", "1000")
     props.put("topic", topic)
+    props.put("batch_count", batch_count)
+    props.put("topic_type", topic_type)
     props
   }
 
   def launch {
     var cg_config = createConsumerConfig
-    println(cg_config)
+    //println(cg_config)
 
     for (i <- 1 to threadNumber by 1) {
       println("start Thread ****  groupId : " + a_groupId + ", thread : " + i)

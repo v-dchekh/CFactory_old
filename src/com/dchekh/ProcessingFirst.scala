@@ -6,33 +6,56 @@ import scala.collection.mutable.ListMap
 import scala.collection.mutable.HashMap
 
 class ProcessingFirst extends Processing {
-  override def run(messageArray: ArrayBuffer[GenericRecord]): Int = {
+
+   def run(messageArray: ArrayBuffer[GenericRecord]): Int = {
     var result = 1
     var count_ : Int = messageArray.size
-
+    var toSQL = new ArrayBuffer[Map[String, String]]()
+    var toSQLAny = new ArrayBuffer[Any]()
     messageArray.foreach { x =>
-      println("rec ----> " + x)
-      var fl = x.getSchema.getFields
+      var schemaFields = x.getSchema.getFields
+      var schemaDoc = x.getSchema.getDoc
       var a = 0
       var recordToMap = new HashMap[String, Any]
-      for (a <- 0 until fl.size()) {
-        val fieldName  = fl.get(a).name()
-        val fieldOrder = fl.get(a).order()
-        val fieldValue = x.get(a)
-        val field      = fl.get(a)
-        val fieldType  = fl.get(a).schema().getType
-        println(s"a = $a , " + fieldName + " = " + fieldValue + s", fieldOrder = $fieldOrder, field -> $field, fieldType -> $fieldType ")
-        recordToMap += (fieldName -> fieldValue)
+      for (a <- 0 until schemaFields.size()) {
+        val field = schemaFields.get(a)
+        val fieldName_ = field.name()
+        val fieldOrder = field.order()
+        val fieldType_ = field.schema().getType
+        val fieldType2_ = field.schema().getType.getName
+        val fieldValue = x.get(a).toString()
+        val fieldValueSQL = fieldType_.toString() match {
+          case "STRING" => {
+            if (fieldValue == "%null%") "null"
+            else "'" + fieldValue.replace("'", "'''") + "'"
+          }
+          case _ => fieldValue
+        }
+        //println(s"a = $a , " + fieldName_ + " = " + fieldValue + s", fieldOrder = $fieldOrder, field -> $field, fieldType -> $fieldType2_ ")
+        recordToMap += (fieldName_ -> fieldValueSQL)
 
       }
+      /*
       val recordToMapSorted = recordToMap.toSeq.sortWith(_._1 < _._1)
       val recordToMapSorted2 = recordToMap.toSeq.sortWith(_._1 > _._1)
       println("MAP    ------: " + recordToMap)
       println("MAP S  ------: " + recordToMapSorted.toMap)
       println("MAP S2 ------: " + recordToMapSorted2.toMap)
       println("MAP ls ------: " + recordToMapSorted2.toMap.values.toList.mkString("('", "','", "')"))
-
+      println("MAP keys-----: " + recordToMapSorted2.toMap.keys.toList.mkString("insert into (", ",", ") values "))
+      * 
+      */
+      val recordToMapSorted2 = recordToMap.toSeq.sortWith(_._1 < _._1)
+      val sqlFields = recordToMapSorted2.toMap.keys.toList.mkString("(", ",", ")")
+      val sqlValues = recordToMapSorted2.toMap.values.toList.mkString("(", ",", ")")
+      val sqlStr = sqlFields + sqlValues
+      toSQL += Map(sqlFields -> sqlValues)
+      val l = (sqlFields, sqlValues, schemaDoc)
+      toSQLAny += l
     }
+    println("-----------------------------------------------------------------------------------------")
+    println(toSQLAny.toList.mkString("\n").replace("),", ")|"))
+
     result
   }
 
