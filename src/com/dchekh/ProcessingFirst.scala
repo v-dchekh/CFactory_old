@@ -9,9 +9,9 @@ class ProcessingFirst extends Processing {
 
    def run(messageArray: ArrayBuffer[GenericRecord]): Int = {
     var result = 1
-    var count_ : Int = messageArray.size
-    var toSQL = new ArrayBuffer[Map[String, String]]()
-    var toSQLAny = new ArrayBuffer[Any]()
+    val count_ = messageArray.size
+    val toSQL = ArrayBuffer[Map[String, String]]()
+    val toSQLAny = ArrayBuffer[Any]()
     messageArray.foreach { x =>
       var schemaFields = x.getSchema.getFields
       var schemaDoc = x.getSchema.getDoc

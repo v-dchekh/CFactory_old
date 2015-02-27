@@ -9,12 +9,11 @@ import scala.xml.Elem
 object SchemaListObj {
 
   def getSchemaList(cfg_XML: Elem) = {
-    var schema_list_XML = (cfg_XML \\ "schemas" \\ "schema")
+    val schema_list_XML = (cfg_XML \\ "schemas" \\ "schema")
     var schema_list_Map = new HashMap[Int, Schema]
     schema_list_XML.foreach { n =>
-      //      val m = Map("id" -> (n \ "@id").text, "schema" -> schema)
-      var schema = Schema.parse(new File((n \ "@file").text))
-      var schema_id = (n \ "@id").text.toInt
+      val schema = Schema.parse(new File((n \ "@file").text))
+      val schema_id = (n \ "@id").text.toInt
       schema_list_Map += (schema_id -> schema)
     }
     //println("getSchemaList(cfg_XML: Elem)")
@@ -22,8 +21,8 @@ object SchemaListObj {
   }
 
   def getcons_groupList(cfg_XML: Elem) = {
-    var cons_groupList = (cfg_XML \\ "consumer_groups" \\ "consumer_group")
-    val groupList = new ArrayBuffer[Any]()
+    val cons_groupList = (cfg_XML \\ "consumer_groups" \\ "consumer_group")
+    val groupList = new ArrayBuffer[Map[String, Any]]()
 
     cons_groupList.foreach { n =>
       val groupId = (n \ "@groupId").text
@@ -33,8 +32,13 @@ object SchemaListObj {
       val batch_count = (n \ "@batch_count").text
       val topic_type = (n \ "@topic_type").text
 
-      val m = Map("groupId" -> groupId, "zkconnect" -> zkconnect, "topic" -> topic, "thread_number" -> thread_number,
-        "batch_count" -> batch_count, "topic_type" -> topic_type)
+      val m = Map(
+        "groupId" -> groupId,
+        "zkconnect" -> zkconnect,
+        "topic" -> topic,
+        "thread_number" -> thread_number,
+        "batch_count" -> batch_count,
+        "topic_type" -> topic_type)
       groupList += m
 
     }
@@ -42,11 +46,9 @@ object SchemaListObj {
   }
 
   def getThread_number(cfg_XML: Elem) = {
-    var cons_groupList = (cfg_XML \\ "consumer_groups" \\ "consumer_group")
+    val cons_groupList = (cfg_XML \\ "consumer_groups" \\ "consumer_group")
     var thread_number: Int = 0
-    cons_groupList.foreach { n =>
-      thread_number = thread_number + ((n \ "@thread_number").text).toInt
-    }
+    cons_groupList.foreach { n => thread_number += ((n \ "@thread_number").text).toInt }
     thread_number
   }
 }

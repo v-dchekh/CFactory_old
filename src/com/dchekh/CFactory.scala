@@ -8,8 +8,11 @@ import org.apache.avro.Schema
 import scala.collection.mutable.HashMap
 import scala.xml.XML
 import scala.xml.Elem
+import org.apache.log4j.Logger
+import org.apache.log4j.BasicConfigurator
 
 object CFactory {
+  protected val logger = Logger.getLogger(getClass.getName)
 
   val usage = """
 Usage: parser [-v] [-f file] [-s sopt] ...
@@ -19,7 +22,7 @@ Where: -v   Run verbosely
 """
 
   var schema_list: HashMap[Int, Schema] = null // = SchemaListObj.list
-  var cfg_XML : Elem = null
+  var cfg_XML: Elem = null
 
   var filename: String = ""
   var showme: String = ""
@@ -47,12 +50,10 @@ Where: -v   Run verbosely
   }
 
   def main(args: Array[String]) {
-    // if there are required args:
-    //    if (args.length == 0) die()
+    //---------- read and parce arguments ---------------// 
     val arglist = args.toList
     val remainingopts = parseArgs(arglist, pf)
 
-//    if (filename.length == 0) filename = "d:/Users/Dzmitry_Chekh/Scala_workspace/CFactory/bin/consumer_groups.xml"
     if (filename.length == 0) filename = "./consumer_groups.xml"
 
     println("CFactory v0.1")
@@ -61,19 +62,29 @@ Where: -v   Run verbosely
     println("filename=" + filename)
     println("remainingopts=" + remainingopts)
 
+    //--------------------- read the config file -------------------// 
     cfg_XML = XML.loadFile(filename)
 
+    //--------------------- get avro schemas---- -------------------// 
     schema_list = SchemaListObj.getSchemaList(cfg_XML)
 
+    //--------------------- get total number threads----------------// 
     val latch = new CountDownLatch(SchemaListObj.getThread_number(cfg_XML))
 
-    //---------- run consumer group -----------------// 
+    //--------------------- get a list of consumer groups-----------// 
     val groupList = SchemaListObj.getcons_groupList(cfg_XML)
+
+    //--------------------- run consumer groups---------------------// 
+
     groupList.foreach { n =>
-      val i = n.asInstanceOf[Map[String, Any]]
-      val cg = new ConsumerGroup(i("thread_number").toString().toInt, i("zkconnect").toString(), i("groupId").toString(),
-          i("topic").toString(), latch, i("batch_count").toString(), i("topic_type").toString()).launch
-      //println(s"$groupId, $zkconnect, $topic")
+      val cg = new ConsumerGroup(
+        n("thread_number").toString().toInt,
+        n("zkconnect").toString(),
+        n("groupId").toString(),
+        n("topic").toString(),
+        n("batch_count").toString(),
+        n("topic_type").toString(),
+        latch).launch
     }
     latch.await()
 

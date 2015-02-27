@@ -4,20 +4,28 @@
 package com.dchekh
 
 import java.util.Properties
-import kafka.utils.Logging
 import java.util.concurrent.CountDownLatch
+import kafka.utils.Logging
 import org.apache.avro.Schema
+import org.apache.log4j.Logger
+import org.apache.log4j.BasicConfigurator
 import scala.collection.mutable.HashMap
 
-class ConsumerGroup(threadNumber: Int = 5, a_zookeeper: String, a_groupId: String, topic: String, latch: CountDownLatch, 
-    batch_count: String, topic_type : String) extends Logging {
+class ConsumerGroup(threadNumber: Int = 5,
+                    zookeeper: String,
+                    groupId: String,
+                    topic: String,
+                    batch_count: String,
+                    topic_type: String,
+                    latch: CountDownLatch) {
 
   //  info("setup:start topic=%s for zk=%s and groupId=%s".format(topic, a_zookeeper, a_groupId))
+  protected val logger = Logger.getLogger(getClass.getName)
 
   def createConsumerConfig: Properties = {
     val props = new Properties()
-    props.put("zookeeper.connect", a_zookeeper)
-    props.put("group.id", a_groupId)
+    props.put("zookeeper.connect", zookeeper)
+    props.put("group.id", groupId)
     props.put("zookeeper.session.timeout.ms", "4000")
     props.put("zookeeper.sync.time.ms", "200")
     props.put("auto.commit.interval.ms", "1000")
@@ -28,17 +36,16 @@ class ConsumerGroup(threadNumber: Int = 5, a_zookeeper: String, a_groupId: Strin
   }
 
   def launch {
-    var cg_config = createConsumerConfig
-    //println(cg_config)
+    val cg_config = createConsumerConfig
 
     for (i <- 1 to threadNumber by 1) {
-      println("start Thread ****  groupId : " + a_groupId + ", thread : " + i)
+      println("start Thread ****  groupId : " + groupId + ", thread : " + i)
       try {
-        var consumer = new MyConsumer[String](":" + i,  latch, cg_config)
+        var consumer = new MyConsumer[String](":" + i, latch, cg_config)
         new Thread(consumer).start()
       } catch {
         case e: Throwable =>
-          if (true) error("Error creating new Consumer: ", e)
+          if (true) logger.error("Error creating new Consumer: ", e)
           else throw e
       }
     }

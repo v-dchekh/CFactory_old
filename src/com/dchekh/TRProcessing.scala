@@ -18,9 +18,9 @@ class Processing extends TRProcessing {
     topic_type_ = topic_type
     topic_type match {
       case 0 =>
-        var pr = new ProcessingFirst().run(messageArray)
+        val pr = new ProcessingFirst().run(messageArray)
       case 1 =>
-        var pr = new ProcessingSystem().run(messageArray)
+        val pr = new ProcessingSystem().run(messageArray)
       case _ => println(s"topic_type = not in (0,1)")
     }
     result
@@ -38,7 +38,7 @@ class ProcessingSystem extends Processing {
   }
   private def schemasListAdd(fieldSchemaValue: String) {
     println(s"topic_type = add")
-    var path = "d:/Users/Dzmitry_Chekh/Scala_workspace/kafka_prod_cons/avro/user5.avsc"
+    val path = "d:/Users/Dzmitry_Chekh/Scala_workspace/kafka_prod_cons/avro/user5.avsc"
     Files.write(Paths.get(path), fieldSchemaValue.getBytes(StandardCharsets.UTF_8))
     println(createElement(Some(path)))
     schemasListRefresh
@@ -51,44 +51,26 @@ class ProcessingSystem extends Processing {
   def run(messageArray: ArrayBuffer[GenericRecord]): Int = {
     var result = 1
     messageArray.foreach { x =>
-      var schemaFields = x.getSchema.getFields
-      var schemaDoc = x.getSchema.getDoc
-      var recordToMap = new HashMap[String, Any]
+      val schemaFields = x.getSchema.getFields
+      val schemaDoc = x.getSchema.getDoc
+      val recordToMap = HashMap[String, Any]()
       val fieldAction = schemaFields.get(0)
-      val fieldActionName_ = fieldAction.name()
+      val fieldActionName = fieldAction.name()
       val fieldActionValue = x.get(0).toString()
 
-      val fieldSchema = schemaFields.get(1)
-      val fieldSchemaName_ = fieldAction.name()
-      val fieldSchemaValue = x.get(1).toString()
+      val fieldAvroSchema = schemaFields.get(1)
+      val fieldAvroSchemaName = fieldAction.name()
+      val fieldAvroSchemaValue = x.get(1).toString()
 
-      fieldActionName_ match {
+      fieldActionName match {
         case "action" => {
           fieldActionValue match {
-            case "refresh" => schemasListRefresh
-            case "add"     => schemasListAdd(fieldSchemaValue)
+            case "add"     => schemasListAdd(fieldAvroSchemaValue)
             case "delete"  => schemasListDelete
+            case "refresh" => schemasListRefresh
             case _         => println(s"topic_type is not in (refresh)")
           }
           //println(CFactory.schema_list.mkString("\n"))
-          /*
-      for (a <- 0 until schemaFields.size()) {
-        val field = schemaFields.get(a)
-        val fieldName_ = field.name()
-        val fieldValue = x.get(a).toString()
-        fieldName_ match {
-          case "action" => {
-            fieldValue match {
-              case "refresh" => schemasListRefresh
-              case "add"     => schemasListAdd
-              case "delete"  => schemasListDelete
-              case _         => println(s"topic_type is not in (refresh)")
-            }
-          }
-          case _ => null //println(s" fieldName_  = $fieldValue ")
-        }
-      * 
-      */
         }
       }
     }

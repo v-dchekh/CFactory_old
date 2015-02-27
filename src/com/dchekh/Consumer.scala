@@ -2,11 +2,14 @@ package com.dchekh
 
 import java.util.concurrent.CountDownLatch
 import java.util.Properties
+
 import kafka.consumer.{ ConsumerConfig, Whitelist, Consumer }
+
 import scala.collection.JavaConversions._
 import scala.collection.mutable.HashMap
-import org.apache.avro.Schema
 import scala.collection.mutable.ArrayBuffer
+
+import org.apache.avro.Schema
 import org.apache.avro.generic.{ GenericRecord }
 
 class MyConsumer[T](mes: String, cdl: CountDownLatch, cg_config: Properties) extends Runnable {
@@ -18,11 +21,10 @@ class MyConsumer[T](mes: String, cdl: CountDownLatch, cg_config: Properties) ext
   val topic_type = cg_config.getProperty("topic_type").toInt
 
   val stream = connector.createMessageStreamsByFilter(filterSpec, 1).get(0)
-  var list = List[String]()
 
   def run() {
     val p1 = new Processing
-    while (true) read(bytes => p1.run(bytes, topic_type))
+    while (true) read(messageArray => p1.run(messageArray, topic_type))
     cdl.countDown()
   }
 
@@ -30,12 +32,11 @@ class MyConsumer[T](mes: String, cdl: CountDownLatch, cg_config: Properties) ext
     //-----------    info("reading on stream now")-------------//
     var numMessages: Int = 0
     var numMessagesTotal: Int = 0
-    val messagArray = new ArrayBuffer[GenericRecord]()
+    val messagArray =  ArrayBuffer[GenericRecord]()
     for (messageAndTopic <- stream) //    while (!stream.isEmpty)
     {
       try {
-        var m = messageAndTopic.message
-        var message = AvroWrapper.decode(m)
+        var message = AvroWrapper.decode(messageAndTopic.message)
         var part = messageAndTopic.partition
         numMessages += 1
         numMessagesTotal += 1
