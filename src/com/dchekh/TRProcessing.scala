@@ -18,7 +18,7 @@ class Processing extends TRProcessing {
     topic_type_ = topic_type
     topic_type match {
       case 0 =>
-        val pr = new ProcessingFirst().run(messageArray)
+        val pr = new ProcessingSQLInsert().run(messageArray)
       case 1 =>
         val pr = new ProcessingSystem().run(messageArray)
       case _ => println(s"topic_type = not in (0,1)")

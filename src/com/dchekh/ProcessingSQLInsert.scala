@@ -5,7 +5,7 @@ import org.apache.avro.generic.{ GenericRecord }
 import scala.collection.mutable.ListMap
 import scala.collection.mutable.HashMap
 
-class ProcessingFirst extends Processing {
+class ProcessingSQLInsert extends Processing {
 
    def run(messageArray: ArrayBuffer[GenericRecord]): Int = {
     var result = 1
