@@ -6,7 +6,7 @@ import java.io.File
 import scala.collection.mutable.HashMap
 import scala.xml.Elem
 
-object SchemaListObj {
+object Configurations {
 
   def getSchemaList(cfg_XML: Elem) = {
     val schema_list_XML = (cfg_XML \\ "schemas" \\ "schema")

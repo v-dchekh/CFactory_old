@@ -34,7 +34,7 @@ class ProcessingSystem extends Processing {
 
   private def schemasListRefresh {
     println(s"topic_type = refresh")
-    CFactory.schema_list = SchemaListObj.getSchemaList(XML.loadFile(CFactory.filename))
+    CFactory.schema_list = Configurations.getSchemaList(XML.loadFile(CFactory.filename))
   }
   private def schemasListAdd(fieldSchemaValue: String) {
     println(s"topic_type = add")
