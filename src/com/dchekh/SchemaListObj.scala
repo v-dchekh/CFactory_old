@@ -12,7 +12,7 @@ object SchemaListObj {
     var schema_list_XML = (cfg_XML \\ "schemas" \\ "schema")
     var schema_list_Map = new HashMap[Int, Schema]
     schema_list_XML.foreach { n =>
-//      val m = Map("id" -> (n \ "@id").text, "schema" -> schema)
+      //      val m = Map("id" -> (n \ "@id").text, "schema" -> schema)
       var schema = Schema.parse(new File((n \ "@file").text))
       var schema_id = (n \ "@id").text.toInt
       schema_list_Map += (schema_id -> schema)
@@ -33,8 +33,8 @@ object SchemaListObj {
       val batch_count = (n \ "@batch_count").text
       val topic_type = (n \ "@topic_type").text
 
-      val m = Map("groupId" -> groupId, "zkconnect" -> zkconnect, "topic" -> topic, "thread_number" -> thread_number, 
-          "batch_count" -> batch_count, "topic_type" -> topic_type)
+      val m = Map("groupId" -> groupId, "zkconnect" -> zkconnect, "topic" -> topic, "thread_number" -> thread_number,
+        "batch_count" -> batch_count, "topic_type" -> topic_type)
       groupList += m
 
     }

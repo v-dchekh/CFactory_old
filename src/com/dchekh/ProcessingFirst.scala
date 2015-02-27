@@ -15,7 +15,7 @@ class ProcessingFirst extends Processing {
     messageArray.foreach { x =>
       var schemaFields = x.getSchema.getFields
       var schemaDoc = x.getSchema.getDoc
-      var a = 0
+      //var a = 0
       var recordToMap = new HashMap[String, Any]
       for (a <- 0 until schemaFields.size()) {
         val field = schemaFields.get(a)

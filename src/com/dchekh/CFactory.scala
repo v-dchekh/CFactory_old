@@ -52,7 +52,8 @@ Where: -v   Run verbosely
     val arglist = args.toList
     val remainingopts = parseArgs(arglist, pf)
 
-    if (filename.length == 0) filename = "d:/Users/Dzmitry_Chekh/Scala_workspace/CFactory/bin/consumer_groups.xml"
+//    if (filename.length == 0) filename = "d:/Users/Dzmitry_Chekh/Scala_workspace/CFactory/bin/consumer_groups.xml"
+    if (filename.length == 0) filename = "./consumer_groups.xml"
 
     println("CFactory v0.1")
     println("debug=" + debug)
